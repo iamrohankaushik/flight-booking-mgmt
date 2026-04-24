@@ -1,0 +1,36 @@
+sequenceDiagram
+    autonumber
+    participant Gateway as Payment Gateway
+    participant K as Kafka (Event)
+    participant B as BookingService
+    participant RMQ as RabbitMQ (Poll)
+    participant DB as Postgres
+    participant P as PaymentAPI (Feign)
+
+    Note over Gateway, K: Path A: Event-Driven Callback (Fast)
+    Gateway->>K: Payment Status Changed
+    K->>B: pay-event (SUCCESS/FAILED)
+    
+    B->>DB: Update (if status=PROCESSING)
+    alt Update Success
+        B->>DB: Confirm Seats & Booking
+        Note over B: Transaction Committed
+    else Already processed (0 rows)
+        Note over B: Ignore Duplicate (Race Winner)
+    end
+
+    Note over RMQ, B: Path B: Scheduled Polling (Fallback/Slow)
+    RMQ->>B: Trigger Poll Cycle
+    
+    B->>DB: Find Booking & Check Status
+    alt Not in PROCESSING (Early Exit)
+        Note over B: Kafka already finished. Stop Polling.
+    else Still PROCESSING
+        B->>P: GET /v1/payments/status/{bookingId}
+        P-->>B: PaymentStatus (SUCCESS/FAILED)
+        
+        B->>DB: Update (if status=PROCESSING)
+        alt Update Success
+            B->>DB: Confirm Seats & Booking
+        end
+    end

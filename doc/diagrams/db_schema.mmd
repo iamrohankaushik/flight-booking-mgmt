@@ -1,0 +1,54 @@
+erDiagram
+    USERS ||--o{ BOOKINGS : "has bookings"
+    FLIGHTS ||--o{ FLIGHT_SCHEDULES : "has schedules"
+    FLIGHTS ||--o{ SEATS : ""
+    FLIGHT_SCHEDULES ||--o{ SEATS : "has seats"
+    FLIGHT_SCHEDULES ||--o{ BOOKINGS : ""
+    BOOKINGS ||--o| PAYMENTS : "has payment"
+
+    USERS {
+        uuid id PK
+        jsonb metadata
+    }
+
+    FLIGHTS {
+        uuid id PK
+        string flight_number
+    }
+
+    FLIGHT_SCHEDULES {
+        uuid id PK
+        uuid flight_id FK
+        string source
+        string dest
+        timestamp start_time
+        timestamp end_time
+    }
+
+    SEATS {
+        uuid id PK
+        uuid flight_id FK
+        uuid schedule_id FK
+        string status
+        decimal base_price
+        jsonb metadata
+    }
+
+    BOOKINGS {
+        uuid id PK
+        uuid user_id FK
+        uuid schedule_id FK
+        jsonb seat_ids
+        string status
+        timestamp created_at
+    }
+
+    PAYMENTS {
+        uuid id PK
+        string pay_id UK
+        decimal amount
+        uuid booking_id FK
+        string status
+        string ref_number
+        timestamp created_at
+    }

@@ -1,0 +1,16 @@
+stateDiagram-v2
+    state SeatStatus {
+        [*] --> AVAILABLE
+        AVAILABLE --> HOLD: Booking Initiated
+        HOLD --> BOOKED: Payment Success
+        HOLD --> AVAILABLE: Payment Failed, Poll timeout
+    }
+
+    state BookingStatus {
+        [*] --> INITIATED
+        INITIATED --> PROCESSING: Intent Creation Success
+        INITIATED --> FAILED: Intent Creation Fail after retry
+        
+        PROCESSING --> CONFIRMED: Kafka/Poll SUCCESS
+        PROCESSING --> FAILED: Kafka/Poll FAILURE
+    }

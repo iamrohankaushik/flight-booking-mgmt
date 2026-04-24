@@ -1,0 +1,38 @@
+graph TB
+    subgraph Client
+        App[Mobile/Web App]
+    end
+
+    subgraph Service Layer
+        FBS[Flight Booking Service]
+        FSS[Flight Searching Service]
+    end
+
+    subgraph Messaging
+        K[Kafka: pay-event]
+        RMQ[RabbitMQ: booking-pay-poll]
+    end
+
+    subgraph Data Tier
+        DB[(PostgreSQL)]
+        RB[Redis: Booking Locks]
+        RS[Redis: Search LRU]
+    end
+
+    subgraph External
+        PAY[Mock Payment Gateway]
+    end
+
+    App -->|Booking Req| FBS
+    App -->|Search Req| FSS
+    
+    FBS -->|Read/Write| DB
+    FBS -->|Distributed Locks| RB
+    FBS -->|Initiate| PAY
+    FBS -->|Retry Events| RMQ
+    K -->|Callbacks| FBS
+    
+    FSS -->|Read| DB
+    FSS -->|LRU Cache| RS
+    
+    PAY -.->|Success/Fail| K

@@ -1,0 +1,35 @@
+sequenceDiagram
+    autonumber
+    participant U as User
+    participant B as BookingService
+    participant R as Redis (Lock)
+    participant DB as Postgres
+    participant P as PaymentAPI (Feign)
+    participant RMQ as RabbitMQ (Poll)
+
+    U->>B: POST /v1/booking
+    Note over B,R: Acquire lock TTL: 1 Minute
+    B->>R: SETNX booking:{scheduleId}:{seatId}
+    
+    alt Lock fails
+        B->>U: 409 Conflict (Seat Unavailable)
+    else Lock acquired
+        B->>DB: Hold Seats (if status=AVAILABLE)
+
+        B->>DB: Create Booking (INITIATED)
+        B->>P: POST /v1/payments
+            alt Timeout/Failure
+                B->>P: Retry (max 2 more)
+            end
+
+            alt Payment Intent Success
+                P-->>B: Intent created with payId
+                B->>DB: Update Booking status (PROCESSING)
+                B->>RMQ: Push to Delay Queue (poll-pay-status)
+                B->>U: 200 OK (PROCESSING)
+            else Payment Intent Final Failure
+                B->>DB: Update Booking status (FAILED)
+                B->>DB: Release Seats (AVAILABLE)
+                B->>U: 200 OK (FAILED)
+            end
+    end

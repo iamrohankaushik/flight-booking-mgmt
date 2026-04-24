@@ -1,0 +1,79 @@
+{
+  "mappings": [
+    {
+      "scenarioName": "Payment Intent Creation",
+      "requiredScenarioState": "Started",
+      "newScenarioState": "Intent Retry",
+      "request": {
+        "method": "POST",
+        "url": "/v1/payments"
+      },
+      "response": {
+        "fixedDelayMilliseconds": 5000,
+        "status": 504
+      }
+    },
+    {
+      "scenarioName": "Payment Intent Creation",
+      "requiredScenarioState": "Intent Retry",
+      "newScenarioState": "Started",
+      "request": {
+        "method": "POST",
+        "url": "/v1/payments"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "payId": "PAY-{{randomValue type='UUID'}}",
+          "status": "INITIATED"
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "transformers": ["response-template"]
+      }
+    },
+    {
+      "scenarioName": "Payment Status Polling",
+      "requiredScenarioState": "Started",
+      "newScenarioState": "Attempt 2",
+      "request": {
+        "method": "GET",
+        "urlPattern": "/v1/payments/status/.*"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": { "status": "INITIATED" },
+        "headers": { "Content-Type": "application/json" }
+      }
+    },
+    {
+      "scenarioName": "Payment Status Polling",
+      "requiredScenarioState": "Attempt 2",
+      "newScenarioState": "Final Success",
+      "request": {
+        "method": "GET",
+        "urlPattern": "/v1/payments/status/.*"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": { "status": "INITIATED" },
+        "headers": { "Content-Type": "application/json" }
+      }
+    },
+    {
+      "scenarioName": "Payment Status Polling",
+      "requiredScenarioState": "Final Success",
+      "newScenarioState": "Started",
+      "request": {
+        "method": "GET",
+        "urlPattern": "/v1/payments/status/.*"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": { "status": "SUCCESS" },
+        "headers": { "Content-Type": "application/json" }
+      }
+    }
+  ]
+}

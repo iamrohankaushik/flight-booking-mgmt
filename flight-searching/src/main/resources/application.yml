@@ -1,0 +1,19 @@
+server:
+  port: 8082
+
+spring:
+  profiles:
+    active: local
+  output:
+    ansi:
+      enabled: ALWAYS
+  datasource:
+    url: jdbc:postgresql://localhost:5432/flight_booking
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  
+  data:
+    redis:
+      host: localhost
+      port: 6380
