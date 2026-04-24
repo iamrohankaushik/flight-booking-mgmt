@@ -24,17 +24,18 @@ The project is structured as a multi-module Gradle project:
 
 ## 🧠 Core Logic & Flows
 ### A. Booking Flow
-1. **Distributed Locking**: Redis `SETNX` on `booking:{scheduleId}:{seatId}`.
+1. **Distributed Locking**: Redis `SETNX` on `booking:{scheduleId}:{seatId}` to prevent concurrent bookings.
 2. **State Transition**: Seat moves to `HOLD`, Booking created as `INITIATED`.
 3. **Intent Creation Retries**: 3 attempts (Try 1 + 2 fallback retries) to create payment intent.
 4. **Dual-Path Reconciliation**: 
    - **Kafka**: Event-driven callback for payment success/failure.
-   - **RabbitMQ Polling**: Fallback path that polls the Payment API if Kafka is delayed.
+   - **RabbitMQ Polling**: Fallback path that polls the Payment API if Kafka is delayed or missed.
 5. **Finalization**: Listener updates status to `CONFIRMED` (Seat -> `BOOKED`) or `FAILED` (Seat -> `AVAILABLE`).
 
 ### B. Search & Caching
-1. **Top 10 LRU**: Redis List used to track recent unique searches.
-2. **Cache Pruning**: Automatically removes the oldest entry from Redis when a new search occurs and the cache is full.
+1. **Top Flight searches (LRU)**: Redis LRU cache stores recent search results by route and date.
+2. **LRU Tracking**: Accessed keys are moved to the front of a Redis list to track recency.
+3. **Cache Pruning**: When capacity is exceeded, the least recently used entry is evicted.
 
 ## 📊 Visual Documentation (Diagrams)
 Detailed technical diagrams are available in the `doc/diagrams` folder:
