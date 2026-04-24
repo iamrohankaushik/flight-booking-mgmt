@@ -11,14 +11,14 @@ Please refer to the **[Setup & Run Guide](doc/setup_guide.md)** for instructions
 ## 🏗️ Project Architecture
 The project is structured as a multi-module Gradle project:
 - **`common`**: Shared module containing:
-  - **`domain`**: Enum definitions for statuses.
+  - **`domain`**: Enum definitions for booking, seat, and payment statuses..
   - **`dto`**: Data Transfer Objects for cross-service communication.
   - **`repository`** & **`repository/impl`**: JOOQ-based implementation of data access.
   - **`db/migration`**: Flyway SQL migrations.
 - **`flight-booking`**: Service for seat locking, booking lifecycle, and payments.
   - **`client`**: OpenFeign client for external Payment API.
-  - **`service/impl`**: Orchestration logic for bookings.
-  - **`listener`**: Kafka (payment callbacks) and RabbitMQ (polling retries) consumers.
+  - **`service/impl`**: Core business logic for booking flow and retries.
+  - **`listener`**: Kafka consumers for payment callbacks and RabbitMQ consumers for polling-based fallback retries.
 - **`flight-searching`**: Service for flight schedule discovery.
   - **`service/impl`**: Search logic with Redis LRU caching.
 
