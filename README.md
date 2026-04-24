@@ -2,6 +2,9 @@
 
 A multi-module Spring Boot application in Kotlin for managing flight bookings and searches.
 
+Architecture diagram:
+<img src="doc/diagrams/high_level_architecture.png" width="800" height="600"/>
+
 ## 🚀 How to Run
 
 ### 1. Start Infrastructure
