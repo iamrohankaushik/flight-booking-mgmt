@@ -30,6 +30,7 @@ The environment consists of:
 Detailed technical diagrams are available in the `doc/diagrams` folder:
 - **High-Level Design (HLD)**: [high_level_architecture.mmd](diagrams/high_level_architecture.mmd)
 - **Booking Flow (Sequence)**: [booking_flow.mmd](diagrams/booking_flow.mmd)
+- **Search LRU Caching (Sequence)**: [search_flow.mmd](diagrams/search_flow.mmd)
 - **State Machine (Transitions)**: [state_transitions.mmd](diagrams/state_transitions.mmd)
 - **Database Architecture (ERD)**: [db_schema.mmd](diagrams/db_schema.mmd)
 

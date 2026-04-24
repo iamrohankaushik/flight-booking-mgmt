@@ -1,0 +1,45 @@
+sequenceDiagram
+    autonumber
+    participant U as User
+    participant C as SearchController
+    participant S as SearchService
+    participant R as Redis (LRU Cache)
+    participant DB as Postgres
+
+    U->>C: GET /v1/search-flights?source=...&dest=...&date=...
+    C->>S: searchFlights(request)
+    
+    Note over S,R: 1. Check Cache
+    S->>R: GET search:{source}:{dest}:{date}
+    
+    alt Cache HIT
+        R-->>S: JSON Result
+        Note over S,R: Update MRU (Most Recently Used)
+        S->>R: LREM (Remove key from LRU list)
+        S->>R: LPUSH (Add key to front of LRU list)
+        S-->>C: Return parsed JSON
+        C-->>U: 200 OK (Schedules)
+    else Cache MISS
+        Note over S,DB: 2. Query Database
+        S->>DB: SELECT schedules JOIN flights (Range Query)
+        DB-->>S: Query Results
+        
+        alt Results Not Empty
+            Note over S,R: 3. Store Cache & Track LRU
+            S->>R: SET search:{source}:{dest}:{date} (JSON)
+            S->>R: LREM (Remove old key from LRU list)
+            S->>R: LPUSH (Add key to front of LRU list)
+            
+            Note over S,R: 4. Enforce Cache Limit
+            S->>R: LLEN search:lru_tracker
+            alt Size > Limit (e.g., 3)
+                S->>R: RPOP (Get oldest key from back)
+                S->>R: DEL (Delete oldest cached result)
+            end
+        else Results Empty
+            Note over S: Skip cache update (Prevent Penetration)
+        end
+        
+        S-->>C: Return Results
+        C-->>U: 200 OK (Schedules)
+    end
