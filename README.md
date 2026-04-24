@@ -12,7 +12,7 @@ Please refer to the **[Setup & Run Guide](doc/setup_guide.md)** for instructions
 ### A. Booking Flow
 1. **Distributed Locking**: Redis `SETNX` on `booking:{scheduleId}:{seatId}` to prevent concurrent bookings.
 2. **State Transition**: Seat moves to `HOLD`, Booking created as `INITIATED`.
-3. **Intent Creation Retries**: 3 attempts (Try 1 + 2 fallback retries) to create payment intent.
+3. **Intent Creation Retries**: API call with retries to create payment-intent in case the Payment Service is unavailable or request times out.
 4. **Dual-Path Reconciliation**: 
    - **Kafka**: Event-driven callback for payment success/failure.
    - **RabbitMQ Polling**: Fallback path that polls the Payment API if Kafka is delayed or missed.
