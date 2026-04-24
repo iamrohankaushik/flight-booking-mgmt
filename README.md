@@ -38,8 +38,8 @@ The project is structured as a multi-module Gradle project:
 
 ## 📊 Visual Documentation (Diagrams)
 Detailed technical diagrams are available in the `doc/diagrams` folder:
-- **High-Level Design (HLD)**: [high_level_architecture.mmd](doc/diagrams/high_level_architecture.mmd)
 - **Booking Flow (Sequence)**: [booking_flow.mmd](doc/diagrams/booking_flow.mmd)
+- **Payment Events (Sequence)**: [payment-events.mmd](doc/diagrams/payment-events.mmd)
 - **Search LRU Caching (Sequence)**: [search_flow.mmd](doc/diagrams/search_flow.mmd)
 - **State Machine (Transitions)**: [state_transitions.mmd](doc/diagrams/state_transitions.mmd)
 - **Database Architecture (ERD)**: [db_schema.mmd](doc/diagrams/db_schema.mmd)
