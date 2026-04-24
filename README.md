@@ -8,20 +8,6 @@ Architecture diagram:
 ## 🚀 Getting Started
 Please refer to the **[Setup & Run Guide](doc/setup_guide.md)** for instructions on how to boot up the Docker infrastructure, generate the database bindings, and start the local services.
 
-## 🏗️ Project Architecture
-The project is structured as a multi-module Gradle project:
-- **`common`**: Shared module containing:
-  - **`domain`**: Enum definitions for booking, seat, and payment statuses..
-  - **`dto`**: Data Transfer Objects for cross-service communication.
-  - **`repository`** & **`repository/impl`**: JOOQ-based implementation of data access.
-  - **`db/migration`**: Flyway SQL migrations.
-- **`flight-booking`**: Service for seat locking, booking lifecycle, and payments.
-  - **`client`**: OpenFeign client for external Payment API.
-  - **`service/impl`**: Core business logic for booking flow and retries.
-  - **`listener`**: Kafka consumers for payment callbacks and RabbitMQ consumers for polling-based fallback retries.
-- **`flight-searching`**: Service for flight schedule discovery.
-  - **`service/impl`**: Search logic with Redis LRU caching.
-
 ## 🧠 Core Logic & Flows
 ### A. Booking Flow
 1. **Distributed Locking**: Redis `SETNX` on `booking:{scheduleId}:{seatId}` to prevent concurrent bookings.
@@ -47,3 +33,17 @@ Detailed technical diagrams are available in the `doc/diagrams` folder:
 
 ## 🧪 Testing
 Please refer to the comprehensive [Testing Guide](doc/testing_guide.md) for detailed `curl` commands and scenarios to test both the Booking Flow and Search LRU Cache logic.
+
+## 🏗️ Project Architecture
+The project is structured as a multi-module Gradle project:
+- **`common`**: Shared module containing:
+  - **`domain`**: Enum definitions for booking, seat, and payment statuses..
+  - **`dto`**: Data Transfer Objects for cross-service communication.
+  - **`repository`** & **`repository/impl`**: JOOQ-based implementation of data access.
+  - **`db/migration`**: Flyway SQL migrations.
+- **`flight-booking`**: Service for seat locking, booking lifecycle, and payments.
+  - **`client`**: OpenFeign client for external Payment API.
+  - **`service/impl`**: Core business logic for booking flow and retries.
+  - **`listener`**: Kafka consumers for payment callbacks and RabbitMQ consumers for polling-based fallback retries.
+- **`flight-searching`**: Service for flight schedule discovery.
+  - **`service/impl`**: Search logic with Redis LRU caching.
