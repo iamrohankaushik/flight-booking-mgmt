@@ -7,6 +7,7 @@ import com.example.demo.searching.repository.SearchRepository
 import org.jooq.DSLContext
 import org.springframework.stereotype.Repository
 import java.time.LocalDate
+import java.time.ZoneId
 import java.time.ZoneOffset
 
 @Repository
@@ -15,8 +16,9 @@ class JooqSearchRepository(
 ) : SearchRepository {
 
     override fun searchSchedules(source: String, dest: String, date: LocalDate): List<FlightScheduleDto> {
-        val startOfDay = date.atStartOfDay().atOffset(ZoneOffset.UTC)
-        val endOfDay = date.plusDays(1).atStartOfDay().atOffset(ZoneOffset.UTC)
+        val zone = ZoneId.systemDefault()
+        val startOfDay = date.atStartOfDay(zone).toOffsetDateTime()
+        val endOfDay = date.plusDays(1).atStartOfDay(zone).toOffsetDateTime()
 
         return dsl.select(
             FLIGHT_SCHEDULES.ID.`as`("scheduleId"),

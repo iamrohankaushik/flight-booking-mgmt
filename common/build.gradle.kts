@@ -64,4 +64,5 @@ flyway {
     user = "postgres"
     password = "postgres"
     locations = arrayOf("filesystem:src/main/resources/db/migration")
+    cleanDisabled = false
 }

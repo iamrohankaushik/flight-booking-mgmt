@@ -13,8 +13,8 @@ VALUES ('f1e2d3c4-b5a6-4c7d-8e9f-0a1b2c3d4e5f',
         'a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d',
         'LHR',
         'JFK',
-        '2026-05-01 10:00:00+00',
-        '2026-05-01 18:00:00+00');
+        NOW() + INTERVAL '1 day',
+        NOW() + INTERVAL '1 day 8 hours');
 
 -- Sample Seats (Valid hex UUIDs)
 INSERT INTO seats (id, flight_id, schedule_id, status, base_price, metadata)
